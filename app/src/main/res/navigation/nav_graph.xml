@@ -7,5 +7,13 @@
     <fragment
         android:id="@+id/productListFragment"
         android:name="com.shabelnikd.shopapp.ui.fragments.ProductListFragment"
-        android:label="ProductListFragment" />
+        android:label="ProductListFragment" >
+        <action
+            android:id="@+id/action_productListFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.shabelnikd.shopapp.ui.fragments.DetailFragment"
+        android:label="DetailFragment" />
 </navigation>
