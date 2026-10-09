@@ -1,4 +1,4 @@
-package com.shabelnikd.shopapp.ui.fragments
+package com.shabelnikd.shopapp.ui.fragments.product
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,19 +8,26 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.shopapp.adapter.ProductAdapter
 import com.shabelnikd.shopapp.R
-import com.shabelnikd.shopapp.data.api.RetrofitService
+import com.shabelnikd.shopapp.data.datasource.RetrofitService
 import com.shabelnikd.shopapp.databinding.FragmentListBinding
+import com.shabelnikd.shopapp.ui.models.UiState
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: ListViewModel by viewModel()
 
     private val adapter = ProductAdapter { productDto ->
         val bundle = bundleOf("PRODUCT_ID" to productDto.id)
@@ -44,7 +51,7 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecycler()
-        loadProducts()
+        observeState()
     }
 
     private fun setupRecycler() {
@@ -52,25 +59,37 @@ class ProductListFragment : Fragment() {
         binding.recyclerView.adapter = adapter
     }
 
-    private fun loadProducts() {
-        binding.progressBar.isVisible = true
-
+    private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    with(binding) {
+                        when (state) {
+                            is UiState.Loading -> {
+                               progressBar.isVisible = true
+                                recyclerView.isVisible = false
+                            }
+                            is UiState.Success -> {
+                                progressBar.isVisible = false
+                                recyclerView.isVisible = true
+                                adapter.submitList(state.data)
+                            }
 
-            try {
-                val products = RetrofitService.api.getAllProducts()
-                adapter.submitList(products)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
-            } finally {
-                _binding?.progressBar?.isVisible = false
+                            is UiState.Error -> {
+                                progressBar.isVisible = false
+                                recyclerView.isVisible = false
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 }

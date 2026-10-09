@@ -1,4 +1,4 @@
-package com.shabelnikd.shopapp.ui.fragments
+package com.shabelnikd.shopapp.ui.fragments.product.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil3.load
-import com.shabelnikd.shopapp.data.api.RetrofitService
+import com.shabelnikd.shopapp.data.datasource.RetrofitService
 import com.shabelnikd.shopapp.databinding.FragmentDetailBinding
 import kotlinx.coroutines.launch
 

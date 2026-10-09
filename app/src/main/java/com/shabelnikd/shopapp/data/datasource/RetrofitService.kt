@@ -1,4 +1,4 @@
-package com.shabelnikd.shopapp.data.api
+package com.shabelnikd.shopapp.data.datasource
 
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -9,6 +9,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object RetrofitService {
     private const val BASE_URL = "https://fakestoreapi.com/"
+    
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -34,9 +35,4 @@ object RetrofitService {
             .build()
             .create(StoreApi::class.java)
     }
-
-
-
-
-
 }
